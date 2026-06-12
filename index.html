@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Guhdo Individual Contour — AR Viewer</title>
+
+  <!-- model-viewer (handles GLB viewing on all platforms + AR launch:
+       Android -> Scene Viewer (GLB), iOS -> AR Quick Look (USDZ)) -->
+  <script type="module"
+    src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #f4f2ee;
+      --accent: #8a5a2b;       /* warm walnut, matches the bed */
+      --accent-press: #6f4621;
+      --text: #2b2622;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .wrap {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      gap: 16px;
+    }
+    h1 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      margin: 0;
+      text-align: center;
+      opacity: 0.85;
+    }
+    model-viewer {
+      width: 100%;
+      max-width: 720px;
+      flex: 1 1 auto;
+      min-height: 0;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+      --poster-color: #ffffff;
+    }
+    .ar-btn {
+      width: 100%;
+      max-width: 720px;
+      border: none;
+      cursor: pointer;
+      background: var(--accent);
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 600;
+      padding: 16px 20px;
+      border-radius: 14px;
+      box-shadow: 0 6px 18px rgba(138,90,43,0.35);
+      transition: background 0.15s ease, transform 0.05s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .ar-btn:active { background: var(--accent-press); transform: translateY(1px); }
+    .ar-btn svg { width: 22px; height: 22px; fill: currentColor; }
+    .hint {
+      font-size: 0.8rem;
+      opacity: 0.55;
+      text-align: center;
+      margin: -6px 0 0;
+    }
+    /* model-viewer's own built-in AR button is hidden; we drive AR from our button */
+    model-viewer::part(default-ar-button) { display: none; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Guhdo Individual Contour</h1>
+
+    <model-viewer
+      id="viewer"
+      src="guhdo_ic.glb"
+      ios-src="guhdo_ic.usdz"
+      alt="Guhdo Individual Contour bed — 3D model"
+      camera-controls
+      touch-action="pan-y"
+      shadow-intensity="1"
+      exposure="1.0"
+      ar
+      ar-modes="scene-viewer webxr quick-look"
+      ar-scale="auto">
+    </model-viewer>
+
+    <button class="ar-btn" id="arButton" aria-label="View in AR">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 2 3 7v10l9 5 9-5V7l-9-5zm0 2.18L18.5 8 12 11.82 5.5 8 12 4.18zM5 9.4l6 3.46v6.74l-6-3.33V9.4zm14 0v6.87l-6 3.33v-6.74l6-3.46z"/>
+      </svg>
+      View In AR
+    </button>
+    <p class="hint">Tap to place the bed in your room</p>
+  </div>
+
+  <script>
+    const viewer = document.querySelector('#viewer');
+    const btn = document.querySelector('#arButton');
+
+    btn.addEventListener('click', () => {
+      // model-viewer auto-routes: Android -> Scene Viewer (GLB),
+      // iOS -> AR Quick Look (USDZ via ios-src). One call does both.
+      if (viewer.canActivateAR) {
+        viewer.activateAR();
+      } else {
+        // Desktop or unsupported: nudge the user, keep the 3D viewer usable.
+        alert('AR is available on a phone or tablet. Open this page on your mobile device to view in AR.');
+      }
+    });
+  </script>
+</body>
+</html>
